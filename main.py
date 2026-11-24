@@ -11,9 +11,15 @@ SENTENCE = "The ceiling fan's shadow turns on the wall a fraction slower than th
 OUTPUT_PATH = os.environ.get("ENTRY_OUTPUT", "/output/entry.txt")
 
 
-def main() -> int:
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+def write_entry(path: str) -> str:
+    """Write the entry sentence to path and return it."""
+    with open(path, "w", encoding="utf-8") as f:
         f.write(SENTENCE)
+    return SENTENCE
+
+
+def main() -> int:
+    write_entry(OUTPUT_PATH)
 
     with open(OUTPUT_PATH, "rb") as f:
         raw = f.read()
@@ -34,6 +40,10 @@ def main() -> int:
     if text.count(".") != 1 or not text.endswith("."):
         print("FAIL: output is not a single sentence", file=sys.stderr)
         return 1
+    # Gate self-checks: exactly one sentence, 1-200 chars, non-blank.
+    assert text.count(".") == 1 and text.endswith("."), "not exactly one sentence"
+    assert 1 <= len(text) <= 200, "length outside 1-200"
+    assert text.strip(), "blank output"
     print(f"OK: {len(text)} chars, single sentence")
     return 0
 
